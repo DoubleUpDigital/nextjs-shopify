@@ -46,7 +46,7 @@ export async function getStaticProps({
 export async function getStaticPaths({ locales }: GetStaticPathsContext) {
   const paths = await getAllCollectionPaths(shopifyConfig)
   return {
-    paths: paths.map((path) => `/collection/${path}`),
+    paths: paths.map((path) => `/collections/${path}`),
     fallback: 'blocking',
   }
 }
