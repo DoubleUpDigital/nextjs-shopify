@@ -1,8 +1,3 @@
-import type {
-  GetStaticPathsContext,
-  GetStaticPropsContext,
-  InferGetStaticPropsType,
-} from 'next'
 import { useRouter } from 'next/router'
 import { BuilderComponent, builder, useIsPreviewing } from '@builder.io/react'
 import { resolveBuilderContent } from '@lib/resolve-builder-content'
@@ -17,13 +12,10 @@ import Head from 'next/head'
 import { useThemeUI } from '@theme-ui/core'
 import { getLayoutProps } from '@lib/get-layout-props'
 
-builder.init(builderConfig.apiKey!)
+builder.init(builderConfig.apiKey)
 const builderModel = 'collection-page'
 
-export async function getStaticProps({
-  params,
-  locale,
-}: GetStaticPropsContext<{ handle: string }>) {
+export async function getStaticProps({ params, locale }) {
   const collection = await getCollection(shopifyConfig, {
     handle: params?.handle,
   })
@@ -43,7 +35,7 @@ export async function getStaticProps({
   }
 }
 
-export async function getStaticPaths({ locales }: GetStaticPathsContext) {
+export async function getStaticPaths({ locales }) {
   const paths = await getAllCollectionPaths(shopifyConfig)
   return {
     paths: paths.map((path) => `/collections/${path}`),
@@ -51,10 +43,7 @@ export async function getStaticPaths({ locales }: GetStaticPathsContext) {
   }
 }
 
-export default function Handle({
-  collection,
-  page,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Handle({ collection, page }) {
   const router = useRouter()
   const isPreviewing = useIsPreviewing()
   const isLive = !isPreviewing

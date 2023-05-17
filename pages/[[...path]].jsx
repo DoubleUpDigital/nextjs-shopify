@@ -1,36 +1,23 @@
-import type {
-  GetStaticPathsContext,
-  GetStaticPropsContext,
-  InferGetStaticPropsType,
-} from 'next'
-import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import {
-  BuilderComponent,
-  Builder,
-  builder,
-  useIsPreviewing,
-} from '@builder.io/react'
+import { NextSeo } from 'next-seo'
+import { BuilderComponent, Builder, builder, useIsPreviewing } from '@builder.io/react'
 import builderConfig from '@config/builder'
 import DefaultErrorPage from 'next/error'
 import Head from 'next/head'
 import { resolveBuilderContent } from '@lib/resolve-builder-content'
-
-builder.init(builderConfig.apiKey)
-import '../blocks/ProductGrid/ProductGrid.builder'
-import '../blocks/CollectionView/CollectionView.builder'
 import { useThemeUI } from '@theme-ui/core'
 import { getLayoutProps } from '@lib/get-layout-props'
 import { useAddItemToCart } from '@lib/shopify/storefront-data-hooks'
 import { useUI } from '@components/common/context'
 import Link from '@components/common/Link'
 
+builder.init(builderConfig.apiKey)
+import '../blocks/ProductGrid/ProductGrid.builder'
+import '../blocks/CollectionView/CollectionView.builder'
+
 const isProduction = process.env.NODE_ENV === 'production'
 
-export async function getStaticProps({
-  params,
-  locale,
-}: GetStaticPropsContext<{ path: string[] }>) {
+export async function getStaticProps({ params, locale }) {
   const page = await resolveBuilderContent('page', locale, {
     urlPath: '/' + (params?.path?.join('/') || ''),
   })
@@ -40,24 +27,18 @@ export async function getStaticProps({
       locale,
       ...(await getLayoutProps()),
     },
-    // Next.js will attempt to re-generate the page:
-    // - When a request comes in
-    // - At most once every 5 seconds
     revalidate: 5,
   }
 }
 
-export async function getStaticPaths({ locales }: GetStaticPathsContext) {
+export async function getStaticPaths({ locales }) {
   return {
     paths: [],
     fallback: true,
   }
 }
 
-export default function Path({
-  page,
-  locale,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Path({ page, locale }) {
   const router = useRouter()
   const { theme } = useThemeUI()
   const addToCart = useAddItemToCart()
@@ -66,7 +47,6 @@ export default function Path({
   if (router.isFallback) {
     return <h1>Loading...</h1>
   }
-  // This includes setting the noindex header because static files always return a status 200 but the rendered not found page page should obviously not be indexed
   if (!page && !isPreviewing) {
     return (
       <>
@@ -79,7 +59,7 @@ export default function Path({
     )
   }
 
-  const { title, description, image } = page?.data! || {}
+  const { title, description, image } = page?.data || {}
   return (
     <div>
       {title && (
@@ -114,13 +94,12 @@ export default function Path({
             navigateToCart() {
               openSidebar()
             },
-            navigateToProductPage(product: { handle: string }) {
+            navigateToProductPage(product) {
               router.push(`/product/${product.handle}`)
             },
           },
         }}
-        renderLink={(props: any) => {
-          // nextjs link doesn't handle hash links well if it's on the same page (starts with #)
+        renderLink={(props) => {
           if (props.target === '_blank' || props.href?.startsWith('#')) {
             return <Link as="a" {...props} />
           }

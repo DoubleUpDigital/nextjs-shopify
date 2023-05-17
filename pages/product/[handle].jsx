@@ -1,8 +1,3 @@
-import type {
-  GetStaticPathsContext,
-  GetStaticPropsContext,
-  InferGetStaticPropsType,
-} from 'next'
 import { useRouter } from 'next/router'
 import { BuilderComponent, builder, useIsPreviewing } from '@builder.io/react'
 import { resolveBuilderContent } from '@lib/resolve-builder-content'
@@ -17,14 +12,12 @@ import DefaultErrorPage from 'next/error'
 import Head from 'next/head'
 import { useThemeUI } from 'theme-ui'
 import { getLayoutProps } from '@lib/get-layout-props'
-builder.init(builderConfig.apiKey!)
+
+builder.init(builderConfig.apiKey)
 
 const builderModel = 'product-page'
 
-export async function getStaticProps({
-  params,
-  locale,
-}: GetStaticPropsContext<{ handle: string }>) {
+export async function getStaticProps({ params, locale }) {
   const product = await getProduct(shopifyConfig, {
     handle: params?.handle,
   })
@@ -44,7 +37,7 @@ export async function getStaticProps({
   }
 }
 
-export async function getStaticPaths({ locales }: GetStaticPathsContext) {
+export async function getStaticPaths({ locales }) {
   const paths = await getAllProductPaths(shopifyConfig)
   return {
     paths: paths.map((path) => `/product/${path}`),
@@ -52,14 +45,11 @@ export async function getStaticPaths({ locales }: GetStaticPathsContext) {
   }
 }
 
-export default function Handle({
-  product,
-  page,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Handle({ product, page }) {
   const router = useRouter()
   const isLive = !useIsPreviewing()
   const { theme } = useThemeUI()
-  // This includes setting the noindex header because static files always return a status 200 but the rendered not found page page should obviously not be indexed
+  
   if (!product && isLive) {
     return (
       <>
@@ -77,7 +67,7 @@ export default function Handle({
   ) : (
     <BuilderComponent
       isStatic
-      key={product!.id}
+      key={product.id}
       model={builderModel}
       options={{ includeRefs: true }}
       data={{ product, theme }}
